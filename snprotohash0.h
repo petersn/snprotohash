@@ -44,7 +44,7 @@ static void snprotohash0_init(snprotohash0_t* sh, void* key) {
 static void snprotohash0_update(snprotohash0_t* sh, uint64_t length, void* data) {
     uint64_t scratch_fill = sh->length % SNPROTOHASH0_BLOCK_SIZE;
     sh->length += length;
-	// Deal with any residual partial block from last time.
+    // Deal with any residual partial block from last time.
     if (scratch_fill) {
         if (scratch_fill + length < SNPROTOHASH0_BLOCK_SIZE) {
             memcpy(sh->scratch_space + scratch_fill, data, length);
@@ -55,7 +55,7 @@ static void snprotohash0_update(snprotohash0_t* sh, uint64_t length, void* data)
         data += SNPROTOHASH0_BLOCK_SIZE - scratch_fill;
         length -= SNPROTOHASH0_BLOCK_SIZE - scratch_fill;
     }
-	// Hash any complete blocks.
+    // Hash any complete blocks.
     while (length >= SNPROTOHASH0_BLOCK_SIZE) {
         if (length > 4096)
             _mm_prefetch(data + 4096, _MM_HINT_T0);
@@ -63,7 +63,7 @@ static void snprotohash0_update(snprotohash0_t* sh, uint64_t length, void* data)
         data += SNPROTOHASH0_BLOCK_SIZE;
         length -= SNPROTOHASH0_BLOCK_SIZE;
     }
-	// Stash whatever is left over for next time.
+    // Stash whatever is left over for next time.
     memcpy(sh->scratch_space, data, length);
 }
 
