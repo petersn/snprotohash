@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
             perror("Open failed");
             return 1;
         }
-        process(argv[1], 1, fd);
+        process(argv[i], 1, fd);
         close(fd);
     }
 
