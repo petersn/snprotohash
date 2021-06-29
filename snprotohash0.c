@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include "snprotohash0.h"
 
 #define READ_SIZE (1024 * 1024)
 
 uint8_t* buffer;
 snprotohash0_t sh;
+int hit_directories = 0;
 
 void process(const char* name, int print_spaces, int fd) {
     snprotohash0_t sh;
@@ -14,6 +16,10 @@ void process(const char* name, int print_spaces, int fd) {
     while (1) {
         ssize_t amount = read(fd, buffer, READ_SIZE);
         if (amount < 0) {
+            if (errno == EISDIR) {
+                hit_directories++;
+                return;
+            }
             perror("Read failed");
             exit(1);
         }
@@ -48,6 +54,9 @@ int main(int argc, char** argv) {
         process(argv[i], 1, fd);
         close(fd);
     }
+
+    if (hit_directories)
+        printf("(%i arguments were directories.)\n", hit_directories);
 
     return 0;
 }
