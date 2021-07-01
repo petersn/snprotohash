@@ -17,7 +17,7 @@ The goal is 256-bit security as a cryptographic hash function.
 
 To use:
 ```c
-#include "snprotohash.h"
+#include "snprotohash0.h"
 
 // Simple interface.
 // The NULL argument is an optional pointer to a 256-bit (32-byte) key for generating MACs.
@@ -38,7 +38,7 @@ Runs at ≈3.1 GiB/s on my laptop (i7-10750H @ 2.60GHz), with 130 cycles for a s
 (Compare to SipHash-2-4, which gets ~1.5 GiB/s on my laptop, and takes about 30 cycles for a one byte message.)
 The `snprotohash0_file_hashing_utility.c` program reads files very naively, and seems to get ≈1.8 GiB/s.
 
-The header `snprotohash_compact.h` is a slightly shorter and more readable equivalent version that doesn't implement the streaming interface.
+The header `snprotohash0_compact.h` is a slightly shorter and more readable equivalent version that doesn't implement the streaming interface.
 
 License
 =======
