@@ -40,6 +40,50 @@ The `snprotohash0_file_hashing_utility.c` program reads files very naively, and 
 
 The header `snprotohash0_compact.h` is a slightly shorter and more readable equivalent version that doesn't implement the streaming interface.
 
+If you want the super short keyless version, it's just:
+
+```c
+#include <stdint.h>
+#include <string.h>
+#include <x86intrin.h>
+
+#define SNPROTOHASH0_SHUFFLE(feedback_shift) \
+    for (int i = 0; i < 8; i++) \
+        lanes[i] = _mm_aesdec_si128(lanes[i], lanes[(i + feedback_shift) % 8]);
+
+#define SNPROTOHASH0_ABSORB(block) \
+    for (int i = 0; i < 4; i++) \
+        lanes[i + 0] = _mm_add_epi64(lanes[i + 0], ((__m128i*) (block))[i]); \
+    SNPROTOHASH0_SHUFFLE(4) SNPROTOHASH0_SHUFFLE(3) SNPROTOHASH0_SHUFFLE(2) \
+    for (int i = 0; i < 4; i++) \
+        lanes[i + 4] = _mm_add_epi64(lanes[i + 4], ((__m128i*) (block))[i]); \
+    SNPROTOHASH0_SHUFFLE(1) SNPROTOHASH0_SHUFFLE(4) SNPROTOHASH0_SHUFFLE(3)
+
+static void snprotohash0(uint64_t length, void* data, void* hash_output) {
+    __m128i lanes[8];
+    for (uint64_t i = 0; i < 8; i++)
+        lanes[i] = _mm_set_epi64x(i * 0x93c467e37db0c7a4llu, i * 0xd1be3f810152cb56llu);
+    uint64_t remaining_length = length;
+    while (remaining_length >= 64) {
+        SNPROTOHASH0_ABSORB(data)
+        data += 64; remaining_length -= 64;
+    }
+    uint8_t scratch_space[64] = {0};
+    if (remaining_length) {
+        memcpy(scratch_space, data, remaining_length);
+        SNPROTOHASH0_ABSORB(scratch_space)
+        memset(scratch_space, 0, 64);
+    }
+    lanes[0] = _mm_add_epi64(lanes[0], _mm_set_epi64x(0x93c467e37db0c7a4llu, 0xd1be3f810152cb56llu));
+    *(uint64_t*) scratch_space = length;
+    SNPROTOHASH0_ABSORB(scratch_space) SNPROTOHASH0_ABSORB(scratch_space)
+    for (int i = 0; i < 4; i++)
+        lanes[i] = _mm_add_epi64(lanes[i], lanes[i + 4]);
+    for (int i = 0; i < 2; i++)
+        ((__m128i*) hash_output)[i] = _mm_add_epi64(lanes[i], lanes[i + 2]);
+}
+```
+
 License
 =======
 
