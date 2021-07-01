@@ -36,7 +36,7 @@ snprotohash0_end(&ctx, hash_result);
 
 Runs at ≈3.1 GiB/s on my laptop (i7-10750H @ 2.60GHz), with 130 cycles for a short (one byte) message.
 (Compare to SipHash-2-4, which gets ~1.5 GiB/s on my laptop, and takes about 30 cycles for a one byte message.)
-The `snprotohash0` program reads files very naively, and seems to get ≈1.8 GiB/s.
+The `snprotohash0_file_hashing_utility.c` program reads files very naively, and seems to get ≈1.8 GiB/s.
 
 The header `snprotohash_compact.h` is a slightly shorter and more readable equivalent version that doesn't implement the streaming interface.
 
