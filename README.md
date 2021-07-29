@@ -13,7 +13,7 @@ snprotohash0
 ------------
 
 snprotohash0 is a keyed hash function, taking in a 256-bit key, and producing a 256-bit output.
-The goal is 256-bit security as a cryptographic hash function.
+The goal is 256-bit security as a cryptographic hash function, eventually, once I pick a candidate that I like. (I am *not* making any security claims about any of the prototype candidates yet.)
 
 To use:
 ```c
